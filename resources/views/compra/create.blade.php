@@ -6,11 +6,91 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    /* Estilos personalizados con la paleta de colores del login */
+    body {
+        background-color: #f8f9fa;
+    }
+    .bg-primary-custom {
+        background: linear-gradient(135deg, #667eea, #764ba2) !important;
+        color: white;
+    }
+    .bg-success-custom {
+        background: linear-gradient(135deg, #48bb78, #38a169) !important;
+        color: white;
+    }
+    .border-primary-custom {
+        border-color: #667eea !important;
+    }
+    .border-success-custom {
+        border-color: #48bb78 !important;
+    }
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        color: white;
+    }
+    .btn-primary-custom:hover {
+        background: linear-gradient(135deg, #5a6fd1, #67418f);
+        color: white;
+    }
+    .btn-success-custom {
+        background: linear-gradient(135deg, #48bb78, #38a169);
+        border: none;
+        color: white;
+    }
+    .btn-success-custom:hover {
+        background: linear-gradient(135deg, #3fa56b, #2d8555);
+        color: white;
+    }
+    .table thead {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0.75rem 1rem;
+    }
+    .breadcrumb-item a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    }
+    .selectpicker:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    }
+    .modal-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    .card-header-custom {
+        border-radius: 5px 5px 0 0 !important;
+        padding: 0.75rem 1rem;
+    }
+    .card-body-custom {
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+    }
+    .btn-danger-custom {
+        background: linear-gradient(135deg, #f56565, #e53e3e);
+        border: none;
+        color: white;
+    }
+    .btn-danger-custom:hover {
+        background: linear-gradient(135deg, #e04f4f, #d12e2e);
+        color: white;
+    }
+</style>
 @endpush
 
 @section('content')
 <div class="container-fluid px-4">
-    <h1 class="mt-4 text-center">Crear Compra</h1>
+    <h1 class="mt-4 text-center" style="color: #4a5568;">Crear Compra</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{ route('panel') }}">Inicio</a></li>
         <li class="breadcrumb-item"><a href="{{ route('compras.index')}}">Compras</a></li>
@@ -25,10 +105,10 @@
         <div class="row gy-4">
             <!------Compra producto---->
             <div class="col-xl-8">
-                <div class="text-white bg-primary p-1 text-center">
-                    Detalles de la compra
+                <div class="card-header-custom bg-primary-custom p-2 text-center">
+                    <h5 class="mb-0">Detalles de la compra</h5>
                 </div>
-                <div class="p-3 border border-3 border-primary">
+                <div class="card-body-custom p-3">
                     <div class="row">
                         <!-----Producto---->
                         <div class="col-12 mb-4">
@@ -59,34 +139,26 @@
 
                         <!-----botón para agregar--->
                         <div class="col-12 mb-4 mt-2 text-end">
-                            <button id="btn_agregar" class="btn btn-primary" type="button">Agregar</button>
+                            <button id="btn_agregar" class="btn btn-primary-custom" type="button">Agregar</button>
                         </div>
 
                         <!-----Tabla para el detalle de la compra--->
                         <div class="col-12">
                             <div class="table-responsive">
                                 <table id="tabla_detalle" class="table table-hover">
-                                    <thead class="bg-primary">
+                                    <thead>
                                         <tr>
-                                            <th class="text-white">#</th>
-                                            <th class="text-white">Producto</th>
-                                            <th class="text-white">Cantidad</th>
-                                            <th class="text-white">Precio compra</th>
-                                            <th class="text-white">Precio venta</th>
-                                            <th class="text-white">Subtotal</th>
-                                            <th></th>
+                                            <th>#</th>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio compra</th>
+                                            <th>Precio venta</th>
+                                            <th>Subtotal</th>
+                                            <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <th></th>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
+                                        <!-- Filas se agregarán dinámicamente -->
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -96,7 +168,7 @@
                                         </tr>
                                         <tr>
                                             <th></th>
-                                            <th colspan="4">Impuesto %</th> <!-- Cambié "IGV %" por "IVA %" -->
+                                            <th colspan="4">Impuesto %</th>
                                             <th colspan="2"><span id="iva">0</span></th>
                                         </tr>
                                         <tr>
@@ -104,29 +176,27 @@
                                             <th colspan="4">Total</th>
                                             <th colspan="2"> <input type="hidden" name="total" value="0" id="inputTotal"> <span id="total">0</span></th>
                                         </tr>
-
                                     </tfoot>
                                 </table>
                             </div>
                         </div>
 
                         <!--Boton para cancelar compra-->
-                        <div class="col-12 mt-2">
-                            <button id="cancelar" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                Cancelar compra
+                        <div class="col-12 mt-2 text-end">
+                            <button id="cancelar" type="button" class="btn btn-danger-custom" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                <i class="fas fa-times-circle me-1"></i> Cancelar compra
                             </button>
                         </div>
-
                     </div>
                 </div>
             </div>
 
             <!-----Compra---->
             <div class="col-xl-4">
-                <div class="text-white bg-success p-1 text-center">
-                    Datos generales
+                <div class="card-header-custom bg-success-custom p-2 text-center">
+                    <h5 class="mb-0">Datos generales</h5>
                 </div>
-                <div class="p-3 border border-3 border-success">
+                <div class="card-body-custom p-3">
                     <div class="row">
                         <!--Proveedor-->
                         <div class="col-12 mb-2">
@@ -165,7 +235,7 @@
 
                         <!--Impuesto---->
                         <div class="col-sm-6 mb-2">
-                            <label for="impuesto" class="form-label">Impuesto :</label>
+                            <label for="impuesto" class="form-label">Impuesto (%):</label>
                             <input type="number" name="impuesto" id="impuesto" class="form-control" step="0.1" value="16">
                             @error('impuesto')
                             <small class="text-danger">{{ '*'.$message }}</small>
@@ -175,11 +245,9 @@
                         <!--Fecha--->
                         <div class="col-sm-6 mb-2">
                             <label for="fecha" class="form-label">Fecha:</label>
-                            <input readonly type="date" name="fecha" id="fecha" class="form-control border-success" value="<?php echo date("Y-m-d") ?>">
+                            <input readonly type="date" name="fecha" id="fecha" class="form-control" value="<?php echo date("Y-m-d") ?>">
                             <?php
-
                             use Carbon\Carbon;
-
                             $fecha_hora = Carbon::now()->toDateTimeString();
                             ?>
                             <input type="hidden" name="fecha_hora" value="{{$fecha_hora}}">
@@ -187,9 +255,10 @@
 
                         <!--Botones--->
                         <div class="col-12 mt-4 text-center">
-                            <button type="submit" class="btn btn-success" id="guardar">Realizar compra</button>
+                            <button type="submit" class="btn btn-success-custom px-4" id="guardar">
+                                <i class="fas fa-check-circle me-1"></i> Realizar compra
+                            </button>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -209,14 +278,14 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button id="btnCancelarCompra" type="button" class="btn btn-danger" data-bs-dismiss="modal">Confirmar</button>
+                    <button id="btnCancelarCompra" type="button" class="btn btn-danger-custom" data-bs-dismiss="modal">Confirmar</button>
                 </div>
             </div>
         </div>
     </div>
-
 </form>
 @endsection
+
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
 <script>
@@ -231,48 +300,29 @@
 
         disableButtons();
 
-        $('#impuesto').val(impuesto + '%');
-
+        // Configuración inicial del impuesto
+        $('#impuesto').val(impuesto);
     });
 
-    //Variables
     let cont = 0;
     let subtotal = [];
     let sumas = 0;
-    let iva = 0; // Cambiado IGV a IVA
+    let iva = 0;
     let total = 0;
-
-    //Constantes
-    const impuesto = ; // Cambiado el 18% por 16%
+    const impuesto = 16; // Valor por defecto del impuesto
 
     function cancelarCompra() {
-        //Eliminar el tbody de la tabla
         $('#tabla_detalle tbody').empty();
-
-        //Añadir una nueva fila a la tabla
-        let fila = '<tr>' +
-            '<th></th>' +
-            '<td></td>' +
-            '<td></td>' +
-            '<td></td>' +
-            '<td></td>' +
-            '<td></td>' +
-            '<td></td>' +
-            '</tr>';
-        $('#tabla_detalle').append(fila);
-
-        //Reiniciar valores de las variables
         cont = 0;
         subtotal = [];
         sumas = 0;
-        iva = 0; // Cambiado IGV a IVA
+        iva = 0;
         total = 0;
 
-        //Mostrar los campos calculados
-        $('#sumas').html(sumas);
-        $('#iva').html(iva); // Cambiado IGV a IVA
-        $('#total').html(total);
-        $('#impuesto').val(impuesto + '%');
+        $('#sumas').html(sumas.toFixed(2));
+        $('#iva').html(iva.toFixed(2));
+        $('#total').html(total.toFixed(2));
+        $('#impuesto').val(impuesto);
         $('#inputTotal').val(total);
 
         limpiarCampos();
@@ -290,122 +340,80 @@
     }
 
     function agregarProducto() {
-        //Obtener valores de los campos
         let idProducto = $('#producto_id').val();
         let nameProducto = ($('#producto_id option:selected').text()).split(' ')[1];
         let cantidad = $('#cantidad').val();
         let precioCompra = $('#precio_compra').val();
         let precioVenta = $('#precio_venta').val();
+        let currentImpuesto = parseFloat($('#impuesto').val()) || impuesto;
 
-        //Validaciones 
-        //1. Para que los campos no estén vacíos
         if (nameProducto != '' && nameProducto != undefined && cantidad != '' && precioCompra != '' && precioVenta != '') {
-
-            //2. Para que los valores ingresados sean los correctos
             if (parseInt(cantidad) > 0 && (cantidad % 1 == 0) && parseFloat(precioCompra) > 0 && parseFloat(precioVenta) > 0) {
-
-                //3. Para que el precio de compra sea menor que el precio de venta
                 if (parseFloat(precioVenta) > parseFloat(precioCompra)) {
-                    //Calcular valores
-                    subtotal[cont] = round(cantidad * precioCompra);
+                    subtotal[cont] = cantidad * precioCompra;
                     sumas += subtotal[cont];
-                    iva = round(sumas / 100 * impuesto); // Cambiado IGV a IVA
-                    total = round(sumas + iva);
+                    iva = sumas * (currentImpuesto / 100);
+                    total = sumas + iva;
 
-                    //Crear la fila
                     let fila = '<tr id="fila' + cont + '">' +
                         '<th>' + (cont + 1) + '</th>' +
                         '<td><input type="hidden" name="arrayidproducto[]" value="' + idProducto + '">' + nameProducto + '</td>' +
                         '<td><input type="hidden" name="arraycantidad[]" value="' + cantidad + '">' + cantidad + '</td>' +
-                        '<td><input type="hidden" name="arraypreciocompra[]" value="' + precioCompra + '">' + precioCompra + '</td>' +
-                        '<td><input type="hidden" name="arrayprecioventa[]" value="' + precioVenta + '">' + precioVenta + '</td>' +
-                        '<td>' + subtotal[cont] + '</td>' +
-                        '<td><button class="btn btn-danger" type="button" onClick="eliminarProducto(' + cont + ')"><i class="fa-solid fa-trash"></i></button></td>' +
+                        '<td><input type="hidden" name="arraypreciocompra[]" value="' + precioCompra + '">' + parseFloat(precioCompra).toFixed(2) + '</td>' +
+                        '<td><input type="hidden" name="arrayprecioventa[]" value="' + precioVenta + '">' + parseFloat(precioVenta).toFixed(2) + '</td>' +
+                        '<td>' + subtotal[cont].toFixed(2) + '</td>' +
+                        '<td><button class="btn btn-sm btn-danger-custom" type="button" onClick="eliminarProducto(' + cont + ')"><i class="fa-solid fa-trash"></i></button></td>' +
                         '</tr>';
 
-                    //Acciones después de añadir la fila
-                    $('#tabla_detalle').append(fila);
+                    $('#tabla_detalle tbody').append(fila);
                     limpiarCampos();
                     cont++;
                     disableButtons();
 
-                    //Mostrar los campos calculados
-                    $('#sumas').html(sumas);
-                    $('#iva').html(iva); // Cambiado IGV a IVA
-                    $('#total').html(total);
-                    $('#impuesto').val(iva);
-                    $('#inputTotal').val(total);
+                    $('#sumas').html(sumas.toFixed(2));
+                    $('#iva').html(iva.toFixed(2));
+                    $('#total').html(total.toFixed(2));
+                    $('#inputTotal').val(total.toFixed(2));
                 } else {
-                    showModal('Precio de compra incorrecto');
+                    showModal('El precio de venta debe ser mayor al precio de compra');
                 }
-
             } else {
-                showModal('Valores incorrectos');
+                showModal('Valores incorrectos. La cantidad debe ser entera y los precios mayores a cero');
             }
-
         } else {
-            showModal('Le faltan campos por llenar');
+            showModal('Complete todos los campos requeridos');
         }
     }
 
     function eliminarProducto(indice) {
-        //Calcular valores
-        sumas -= round(subtotal[indice]);
-        iva = round(sumas / 100 * impuesto); // Cambiado IGV a IVA
-        total = round(sumas + iva);
+        sumas -= subtotal[indice];
+        let currentImpuesto = parseFloat($('#impuesto').val()) || impuesto;
+        iva = sumas * (currentImpuesto / 100);
+        total = sumas + iva;
 
-        //Mostrar los campos calculados
-        $('#sumas').html(sumas);
-        $('#iva').html(iva); // Cambiado IGV a IVA
-        $('#total').html(total);
-        $('#impuesto').val(iva);
-        $('#InputTotal').val(total);
+        $('#sumas').html(sumas.toFixed(2));
+        $('#iva').html(iva.toFixed(2));
+        $('#total').html(total.toFixed(2));
+        $('#inputTotal').val(total.toFixed(2));
 
-        //Eliminar la fila de la tabla
         $('#fila' + indice).remove();
-
         disableButtons();
     }
 
     function limpiarCampos() {
-        let select = $('#producto_id');
-        select.selectpicker('val', '');
         $('#cantidad').val('');
         $('#precio_compra').val('');
         $('#precio_venta').val('');
+        $('#producto_id').focus();
     }
-
-    function round(num, decimales = 2) {
-        var signo = (num >= 0 ? 1 : -1);
-        num = num * signo;
-        if (decimales === 0) //con 0 decimales
-            return signo * Math.round(num);
-        // round(x * 10 ^ decimales)
-        num = num.toString().split('e');
-        num = Math.round(+(num[0] + 'e' + (num[1] ? (+num[1] + decimales) : decimales)));
-        // x * 10 ^ (-decimales)
-        num = num.toString().split('e');
-        return signo * (num[0] + 'e' + (num[1] ? (+num[1] - decimales) : -decimales));
-    }
-    //Fuente: https://es.stackoverflow.com/questions/48958/redondear-a-dos-decimales-cuando-sea-necesario
 
     function showModal(message, icon = 'error') {
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        })
-
-        Toast.fire({
+        Swal.fire({
             icon: icon,
-            title: message
-        })
+            title: 'Advertencia',
+            text: message,
+            confirmButtonColor: '#667eea'
+        });
     }
 </script>
 @endpush

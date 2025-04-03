@@ -56,4 +56,11 @@ class Producto extends Model
 
         return $name;
     }
+    // En app/Models/Producto.php
+public function ultimoPrecio()
+{
+    return $this->hasOne(CompraProducto::class)
+        ->latestOfMany('created_at')
+        ->select('producto_id', 'precio_venta');
+}
 }

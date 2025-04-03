@@ -3,7 +3,45 @@
 @section('title','Crear usuario')
 
 @push('css')
-
+<style>
+    /* New interface styles - added without modifying existing functionality */
+    .card-header-custom {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 0.375rem 0.375rem 0 0 !important;
+    }
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .btn-primary-custom:hover {
+        background: linear-gradient(135deg, #5a6fd1, #67418f);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    }
+    .info-note {
+        background-color: #f8f9fa;
+        border-left: 4px solid #667eea;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+    .password-input-group {
+        position: relative;
+    }
+</style>
 @endpush
 
 @section('content')
@@ -15,13 +53,21 @@
         <li class="breadcrumb-item active">Crear Usuario</li>
     </ol>
 
-    <div class="card text-bg-light">
+    <div class="card shadow-sm">
+        <div class="card-header card-header-custom">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Nuevo Usuario</h5>
+                <a href="{{ route('users.index') }}" class="btn btn-sm btn-outline-light">
+                    <i class="fas fa-arrow-left me-1"></i> Regresar
+                </a>
+            </div>
+        </div>
         <form action="{{ route('users.store') }}" method="post">
             @csrf
-            <div class="card-header">
-                <p class="">Nota: Los usuarios son los que pueden ingresar al sistema</p>
-            </div>
             <div class="card-body">
+                <div class="info-note">
+                    <i class="fas fa-info-circle me-2"></i> Los usuarios son los que pueden ingresar al sistema
+                </div>
 
                 <!---Nombre---->
                 <div class="row mb-4">
@@ -62,8 +108,9 @@
                 <!---Password---->
                 <div class="row mb-4">
                     <label for="password" class="col-lg-2 col-form-label">Contraseña:</label>
-                    <div class="col-lg-4">
+                    <div class="col-lg-4 password-input-group">
                         <input type="password" name="password" id="password" class="form-control" aria-labelledby="passwordHelpBlock">
+                        <i class="fas fa-eye password-toggle" id="togglePassword"></i>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-text" id="passwordHelpBlock">
@@ -80,8 +127,9 @@
                 <!---Confirm_Password---->
                 <div class="row mb-4">
                     <label for="password_confirm" class="col-lg-2 col-form-label">Confirmar:</label>
-                    <div class="col-lg-4">
+                    <div class="col-lg-4 password-input-group">
                         <input type="password" name="password_confirm" id="password_confirm" class="form-control" aria-labelledby="passwordConfirmHelpBlock">
+                        <i class="fas fa-eye password-toggle" id="togglePasswordConfirm"></i>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-text" id="passwordConfirmHelpBlock">
@@ -117,18 +165,41 @@
                         @enderror
                     </div>
                 </div>
-
             </div>
             <div class="card-footer text-center">
-                <button type="submit" class="btn btn-primary">Guardar</button>
+                <button type="submit" class="btn btn-primary-custom">
+                    <i class="fas fa-save me-1"></i> Guardar
+                </button>
             </div>
         </form>
     </div>
-
-
 </div>
 @endsection
 
 @push('js')
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Toggle password visibility
+        const togglePassword = document.querySelector('#togglePassword');
+        const togglePasswordConfirm = document.querySelector('#togglePasswordConfirm');
+        const password = document.querySelector('#password');
+        const passwordConfirm = document.querySelector('#password_confirm');
 
+        if (togglePassword) {
+            togglePassword.addEventListener('click', function() {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
+
+        if (togglePasswordConfirm) {
+            togglePasswordConfirm.addEventListener('click', function() {
+                const type = passwordConfirm.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordConfirm.setAttribute('type', type);
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
+    });
+</script>
 @endpush

@@ -8,6 +8,72 @@
 
 @push('css')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    /* Consistent styling with your brand management */
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .btn-primary-custom:hover {
+        background: linear-gradient(135deg, #5a6fd1, #67418f);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .card-header-custom {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 0.375rem 0.375rem 0 0 !important;
+    }
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0.75rem 1rem;
+    }
+    .breadcrumb-item a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    h1 {
+        color: #4a5568;
+    }
+    .badge-active {
+        background: linear-gradient(135deg, #48bb78, #38a169);
+        color: white;
+    }
+    .badge-inactive {
+        background: linear-gradient(135deg, #f56565, #e53e3e);
+        color: white;
+    }
+    .action-buttons {
+        min-width: 120px;
+    }
+    .category-badge {
+        margin: 2px;
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+    .img-thumbnail {
+        max-width: 70px;
+        max-height: 70px;
+        transition: transform 0.3s ease;
+    }
+    .img-thumbnail:hover {
+        transform: scale(1.5);
+        z-index: 10;
+    }
+    .table-responsive {
+        overflow-x: auto;
+    }
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 2px;
+    }
+</style>
 @endpush
 
 @section('content')
@@ -15,96 +81,119 @@
 @include('layouts.partials.alert')
 
 <div class="container-fluid px-4">
-    <h1 class="mt-4 text-center">Productos</h1>
+    <h1 class="mt-4 text-center">Gestión de Productos</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{ route('panel') }}">Inicio</a></li>
         <li class="breadcrumb-item active">Productos</li>
     </ol>
 
     @can('crear-producto')
-    <div class="mb-4 text-center">
+    <div class="mb-4">
         <a href="{{route('productos.create')}}">
-            <button type="button" class="btn btn-primary">Añadir nuevo registro</button>
+            <button type="button" class="btn btn-primary-custom">
+                <i class="fas fa-plus-circle me-2"></i> Nuevo Producto
+            </button>
         </a>
     </div>
     @endcan
 
-    <div class="card">
-        <div class="card-header">
-            <i class="fas fa-table me-1"></i>
-            Tabla productos
+    <div class="card shadow-sm">
+        <div class="card-header card-header-custom p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-boxes me-2"></i>Listado de Productos</h5>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item" href="#">Activos</a></li>
+                        <li><a class="dropdown-item" href="#">Inactivos</a></li>
+                        <li><a class="dropdown-item" href="#">Todos</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
         <div class="card-body">
-            <table id="datatablesSimple" class="table table-striped fs-6">
-                <thead>
-                    <tr class="text-center">
-                        <th>Código</th>
-                        <th>Imagen</th>
-                        <th>Nombre</th>
-                        <th>Marca</th>
-                        <th>Presentación</th>
-                        <th>Categorías</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($productos as $item)
-                    <tr class="text-center align-middle">
-                        <td class="align-middle">{{ $item->codigo }}</td>
-                        <td class="align-middle">
-                            @if ($item->img_path && file_exists(storage_path('app/public/productos/' . $item->img_path)))
-                            <img src="{{ asset('storage/productos/'.$item->img_path) }}"
-                                alt="{{ $item->nombre }}"
-                                class="img-thumbnail"
-                                style="max-width: 70px; max-height: 70px; display: block; margin: auto;">
-                            @else
-                            <span class="text-muted">Sin imagen</span>
-                            @endif
-                        </td>
+            <div class="table-responsive">
+                <table id="datatablesSimple" class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Código</th>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Marca</th>
+                            <th>Presentación</th>
+                            <th>Categorías</th>
+                            <th>Estado</th>
+                            <th class="action-buttons">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($productos as $item)
+                        <tr>
+                            <td class="fw-bold">{{ $item->codigo }}</td>
+                            <td class="align-middle">
+                                @if($item->img_path)
+                                    @php
+                                        $imagePath = Storage::disk('public')->exists('productos/'.$item->img_path) 
+                                            ? asset('storage/productos/'.$item->img_path)
+                                            : asset('img/default-product.png');
+                                    @endphp
+                                    <img src="{{ $imagePath }}" 
+                                        alt="{{ $item->nombre }}"
+                                        class="img-thumbnail"
+                                        style="max-width: 70px; max-height: 70px;">
+                                @else
+                                    <span class="text-muted">Sin imagen</span>
+                                @endif
+                            </td>
 
-                        <td class="align-middle">{{ $item->nombre }}</td>
-                        <td class="align-middle">{{ $item->marca->caracteristica->nombre }}</td>
-                        <td class="align-middle">{{ $item->presentacione->caracteristica->nombre }}</td>
-                        <td class="align-middle">
-                            @foreach ($item->categorias as $category)
-                            <div class="container" style="font-size: small;">
-                                <div class="row justify-content-center">
-                                    <span class="m-1 rounded-pill p-1 bg-secondary text-white text-center">
-                                        {{ $category->caracteristica->nombre }}
-                                    </span>
+                            <td>{{ $item->nombre }}</td>
+                            <td>{{ $item->marca->caracteristica->nombre }}</td>
+                            <td>{{ $item->presentacione->caracteristica->nombre }}</td>
+                            <td>
+                                @foreach ($item->categorias as $category)
+                                <span class="badge category-badge rounded-pill bg-secondary">
+                                    {{ $category->caracteristica->nombre }}
+                                </span>
+                                @endforeach
+                            </td>
+                            <td>
+                                @if ($item->estado == 1)
+                                <span class="badge badge-active rounded-pill">Activo</span>
+                                @else
+                                <span class="badge badge-inactive rounded-pill">Inactivo</span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    @can('editar-producto')
+                                    <a href="{{ route('productos.edit', $item->id) }}" 
+                                       class="btn btn-sm btn-outline-primary btn-icon" 
+                                       title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    @endcan
+
+                                    @can('eliminar-producto')
+                                    <form action="{{ route('productos.destroy', $item->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-outline-danger btn-icon" 
+                                                title="Eliminar"
+                                                onclick="return confirmDelete()">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                    @endcan
                                 </div>
-                            </div>
-                            @endforeach
-                        </td>
-                        <td class="align-middle">
-                            @if ($item->estado == 1)
-                            <span class="badge rounded-pill text-bg-success">activo</span>
-                            @else
-                            <span class="badge rounded-pill text-bg-danger">eliminado</span>
-                            @endif
-                        </td>
-                        <td class="align-middle">
-                            <div class="d-flex justify-content-center">
-                                
-                                <!-- Botón para editar -->
-                                <a href="{{ route('productos.edit', $item->id) }}" class="btn btn-warning btn-sm" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <!-- Botón para eliminar -->
-                                <form action="{{ route('productos.destroy', $item->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar" onclick="return confirm('¿Estás segura de que deseas eliminar este producto?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -112,5 +201,41 @@
 
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
-<script src="{{ asset('js/datatables-simple-demo.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Initialize DataTable
+        const dataTable = new simpleDatatables.DataTable("#datatablesSimple", {
+            perPage: 10,
+            labels: {
+                placeholder: "Buscar productos...",
+                searchTitle: "Buscar en la tabla",
+                perPage: "registros por página",
+                noRows: "No se encontraron productos",
+                info: "Mostrando {start} a {end} de {rows} productos",
+            }
+        });
+
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // SweetAlert for delete confirmation
+        window.confirmDelete = function() {
+            return Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡No podrás revertir esto!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminarlo!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                return result.isConfirmed;
+            });
+        };
+    });
+</script>
 @endpush
