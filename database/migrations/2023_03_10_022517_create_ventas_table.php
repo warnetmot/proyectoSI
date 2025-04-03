@@ -12,20 +12,17 @@ return new class extends Migration
      * @return void
      */
     public function up()
-    {
-        Schema::create('ventas', function (Blueprint $table) {
-            $table->id();
-            $table->dateTime('fecha_hora');
-            $table->decimal('impuesto',8,2,true);
-            $table->string('numero_comprobante',255);
-            $table->decimal('total',8,2,true);
-            $table->tinyInteger('estado')->default(1);
-            $table->foreignId('cliente_id')->nullable()->constrained('clientes')->onDelete('set null');
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('comprobante_id')->nullable()->constrained('comprobantes')->onDelete('set null');
-            $table->timestamps();
-        });
-    }
+{
+    Schema::create('venta_producto', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('venta_id')->constrained()->onDelete('cascade');
+        $table->foreignId('producto_id')->constrained();
+        $table->integer('cantidad');
+        $table->decimal('precio_venta', 10, 2);
+        $table->decimal('descuento', 10, 2)->default(0);
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.

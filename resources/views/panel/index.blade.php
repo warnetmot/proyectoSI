@@ -5,6 +5,49 @@
 @push('css')
 <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    /* Estilos adicionales para mantener la paleta de colores */
+    body {
+        background: #f8f9fa;
+    }
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    /* Colores basados en la paleta del login */
+    .bg-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    }
+    .bg-success {
+        background: linear-gradient(135deg, #48bb78, #38a169) !important;
+    }
+    .bg-warning {
+        background: linear-gradient(135deg, #ed8936, #dd6b20) !important;
+    }
+    .bg-danger {
+        background: linear-gradient(135deg, #f56565, #e53e3e) !important;
+    }
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0.75rem 1rem;
+    }
+    h1 {
+        color: #4a5568;
+    }
+    .card-body i {
+        font-size: 1.5rem;
+    }
+    .card-footer {
+        background: rgba(0, 0, 0, 0.1);
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+</style>
 @endpush
 
 @section('content')
@@ -12,10 +55,13 @@
 @if (session('success'))
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-
         let message = "{{ session('success') }}";
-        Swal.fire(message);
-
+        Swal.fire({
+            title: 'Éxito',
+            text: message,
+            icon: 'success',
+            confirmButtonColor: '#667eea'
+        });
     });
 </script>
 @endif
@@ -36,9 +82,7 @@
                         </div>
                         <div class="col-4">
                             <?php
-
                             use App\Models\Cliente;
-
                             $clientes = count(Cliente::all());
                             ?>
                             <p class="text-center fw-bold fs-4">{{$clientes}}</p>
@@ -62,9 +106,7 @@
                         </div>
                         <div class="col-4">
                             <?php
-
                             use App\Models\Categoria;
-
                             $categorias = count(Categoria::all());
                             ?>
                             <p class="text-center fw-bold fs-4">{{$categorias}}</p>
@@ -88,9 +130,7 @@
                         </div>
                         <div class="col-4">
                             <?php
-
                             use App\Models\Compra;
-
                             $compras = count(Compra::all());
                             ?>
                             <p class="text-center fw-bold fs-4">{{$compras}}</p>
@@ -114,9 +154,7 @@
                         </div>
                         <div class="col-4">
                             <?php
-
                             use App\Models\Marca;
-
                             $marcas = count(Marca::all());
                             ?>
                             <p class="text-center fw-bold fs-4">{{$marcas}}</p>
@@ -132,7 +170,7 @@
 
         <!----Presentaciones--->
         <div class="col-xl-3 col-md-6">
-            <div class="card bg-danger text-white mb-4">
+            <div class="card bg-primary text-white mb-4">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-8">
@@ -140,9 +178,7 @@
                         </div>
                         <div class="col-4">
                             <?php
-
                             use App\Models\Presentacione;
-
                             $presentaciones = count(Presentacione::all());
                             ?>
                             <p class="text-center fw-bold fs-4">{{$presentaciones}}</p>
@@ -166,9 +202,7 @@
                         </div>
                         <div class="col-4">
                             <?php
-
                             use App\Models\Producto;
-
                             $productos = count(Producto::all());
                             ?>
                             <p class="text-center fw-bold fs-4">{{$productos}}</p>
@@ -192,9 +226,7 @@
                         </div>
                         <div class="col-4">
                             <?php
-
                             use App\Models\Proveedore;
-
                             $proveedores = count(Proveedore::all());
                             ?>
                             <p class="text-center fw-bold fs-4">{{$proveedores}}</p>
@@ -210,7 +242,7 @@
 
         <!----Users--->
         <div class="col-xl-3 col-md-6">
-            <div class="card bg-primary text-white mb-4">
+            <div class="card bg-danger text-white mb-4">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-8">
@@ -218,9 +250,7 @@
                         </div>
                         <div class="col-4">
                             <?php
-
                             use App\Models\User;
-
                             $users = count(User::all());
                             ?>
                             <p class="text-center fw-bold fs-4">{{$users}}</p>
@@ -233,9 +263,7 @@
                 </div>
             </div>
         </div>
-
     </div>
-   
 </div>
 @endsection
 

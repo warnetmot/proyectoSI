@@ -3,13 +3,68 @@
 @section('title','Editar Producto')
 
 @push('css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
 <style>
     #descripcion {
         resize: none;
     }
+    .card-header-custom {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 0.375rem 0.375rem 0 0 !important;
+    }
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .btn-primary-custom:hover {
+        background: linear-gradient(135deg, #5a6fd1, #67418f);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .form-control:focus, .bootstrap-select .dropdown-toggle:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    }
+    .form-label {
+        font-weight: 600;
+        color: #4a5568;
+    }
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0.75rem 1rem;
+    }
+    .breadcrumb-item a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    h1 {
+        color: #4a5568;
+    }
+    .error-message {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .card-footer {
+        background-color: #f8f9fa;
+        border-top: 1px solid rgba(0,0,0,.125);
+    }
+    .img-preview-container {
+        margin-top: 10px;
+        text-align: center;
+    }
+    .img-preview {
+        max-width: 150px;
+        max-height: 150px;
+        border-radius: 0.375rem;
+        border: 1px solid #dee2e6;
+    }
+    .selectpicker {
+        border-radius: 0.375rem !important;
+    }
 </style>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 @endpush
 
 @section('content')
@@ -18,126 +73,185 @@
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{ route('panel') }}">Inicio</a></li>
         <li class="breadcrumb-item"><a href="{{ route('productos.index')}}">Productos</a></li>
-        <li class="breadcrumb-item active">Editar producto</li>
+        <li class="breadcrumb-item active">Editar</li>
     </ol>
 
-    <div class="card text-bg-light">
-        <form action="{{route('productos.update',['producto'=>$producto])}}" method="post" enctype="multipart/form-data">
-            @method('PATCH')
-            @csrf
-            <div class="card-body">
-
-                <div class="row g-4">
-                    <!----Codigo---->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header card-header-custom">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Editar Producto: {{ $producto->nombre }}</h5>
+                <a href="{{ route('productos.index') }}" class="btn btn-sm btn-outline-light">
+                    <i class="fas fa-arrow-left me-1"></i> Regresar
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('productos.update', $producto) }}" method="post" enctype="multipart/form-data">
+                @method('PATCH')
+                @csrf
+                
+                <div class="row g-3 mb-4">
+                    <!-- Código -->
                     <div class="col-md-6">
-                        <label for="codigo" class="form-label">Código:</label>
-                        <input type="text" name="codigo" id="codigo" class="form-control" value="{{old('codigo',$producto->codigo)}}">
+                        <label for="codigo" class="form-label">Código</label>
+                        <input type="text" name="codigo" id="codigo" 
+                               class="form-control @error('codigo') is-invalid @enderror" 
+                               value="{{ old('codigo', $producto->codigo) }}"
+                               placeholder="Ingrese el código del producto">
                         @error('codigo')
-                        <small class="text-danger">{{'*'.$message}}</small>
+                            <div class="error-message text-danger">{{ '*'.$message }}</div>
                         @enderror
                     </div>
 
-                    <!---Nombre---->
+                    <!-- Nombre -->
                     <div class="col-md-6">
-                        <label for="nombre" class="form-label">Nombre:</label>
-                        <input type="text" name="nombre" id="nombre" class="form-control" value="{{old('nombre',$producto->nombre)}}">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" name="nombre" id="nombre" 
+                               class="form-control @error('nombre') is-invalid @enderror" 
+                               value="{{ old('nombre', $producto->nombre) }}"
+                               placeholder="Ingrese el nombre del producto">
                         @error('nombre')
-                        <small class="text-danger">{{'*'.$message}}</small>
+                            <div class="error-message text-danger">{{ '*'.$message }}</div>
                         @enderror
                     </div>
 
-                    <!---Descripción---->
+                    <!-- Descripción -->
                     <div class="col-12">
-                        <label for="descripcion" class="form-label">Descripción:</label>
-                        <textarea name="descripcion" id="descripcion" rows="3" class="form-control">{{old('descripcion',$producto->descripcion)}}</textarea>
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea name="descripcion" id="descripcion" rows="3"
+                                  class="form-control @error('descripcion') is-invalid @enderror"
+                                  placeholder="Ingrese una descripción del producto">{{ old('descripcion', $producto->descripcion) }}</textarea>
                         @error('descripcion')
-                        <small class="text-danger">{{'*'.$message}}</small>
+                            <div class="error-message text-danger">{{ '*'.$message }}</div>
                         @enderror
                     </div>
 
-                    <!---Fecha de vencimiento---->
+                    <!-- Fecha de vencimiento -->
                     <div class="col-md-6">
-                        <label for="fecha_vencimiento" class="form-label">Fecha de vencimiento:</label>
-                        <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" class="form-control" value="{{old('fecha_vencimiento',$producto->fecha_vencimiento)}}">
+                        <label for="fecha_vencimiento" class="form-label">Fecha de ingreso</label>
+                        <input type="date" name="fecha_vencimiento" id="fecha_vencimiento"
+                               class="form-control @error('fecha_vencimiento') is-invalid @enderror"
+                               value="{{ old('fecha_vencimiento', $producto->fecha_vencimiento) }}">
                         @error('fecha_vencimiento')
-                        <small class="text-danger">{{'*'.$message}}</small>
+                            <div class="error-message text-danger">{{ '*'.$message }}</div>
                         @enderror
                     </div>
 
-                    <!---Imagen---->
+                    <!-- Imagen -->
                     <div class="col-md-6">
-                        <label for="img_path" class="form-label">Imagen:</label>
-                        <input type="file" name="img_path" id="img_path" class="form-control" accept="image/*">
+                        <label for="img_path" class="form-label">Imagen del producto</label>
+                        <input type="file" name="img_path" id="img_path"
+                               class="form-control @error('img_path') is-invalid @enderror"
+                               accept="image/*">
                         @error('img_path')
-                        <small class="text-danger">{{'*'.$message}}</small>
+                            <div class="error-message text-danger">{{ '*'.$message }}</div>
                         @enderror
+                        
+                        @if($producto->img_path)
+                        <div class="img-preview-container mt-2">
+                            <p class="mb-1">Imagen actual:</p>
+                            <img src="{{ asset('storage/productos/'.$producto->img_path) }}" 
+                                 alt="{{ $producto->nombre }}" 
+                                 class="img-preview">
+                        </div>
+                        @endif
                     </div>
 
-                    <!---Marca---->
+                    <!-- Marca -->
                     <div class="col-md-6">
-                        <label for="marca_id" class="form-label">Marca:</label>
-                        <select data-size="4" title="Seleccione una marca" data-live-search="true" name="marca_id" id="marca_id" class="form-control selectpicker show-tick">
+                        <label for="marca_id" class="form-label">Marca</label>
+                        <select name="marca_id" id="marca_id" 
+                                class="form-control selectpicker show-tick @error('marca_id') is-invalid @enderror"
+                                data-live-search="true" 
+                                data-size="5"
+                                title="Seleccione una marca">
                             @foreach ($marcas as $item)
-                            @if ($producto->marca_id == $item->id)
-                            <option selected value="{{$item->id}}" {{ old('marca_id') == $item->id ? 'selected' : '' }}>{{$item->nombre}}</option>
-                            @else
-                            <option value="{{$item->id}}" {{ old('marca_id') == $item->id ? 'selected' : '' }}>{{$item->nombre}}</option>
-                            @endif
+                            <option value="{{ $item->id }}" 
+                                {{ old('marca_id', $producto->marca_id) == $item->id ? 'selected' : '' }}>
+                                {{ $item->nombre }}
+                            </option>
                             @endforeach
                         </select>
                         @error('marca_id')
-                        <small class="text-danger">{{'*'.$message}}</small>
+                            <div class="error-message text-danger">{{ '*'.$message }}</div>
                         @enderror
                     </div>
 
-                    <!---Presentaciones---->
+                    <!-- Presentación -->
                     <div class="col-md-6">
-                        <label for="presentacione_id" class="form-label">Presentación:</label>
-                        <select data-size="4" title="Seleccione una presentación" data-live-search="true" name="presentacione_id" id="presentacione_id" class="form-control selectpicker show-tick">
+                        <label for="presentacione_id" class="form-label">Presentación</label>
+                        <select name="presentacione_id" id="presentacione_id" 
+                                class="form-control selectpicker show-tick @error('presentacione_id') is-invalid @enderror"
+                                data-live-search="true" 
+                                data-size="5"
+                                title="Seleccione una presentación">
                             @foreach ($presentaciones as $item)
-                            @if ($producto->presentacione_id == $item->id)
-                            <option selected value="{{$item->id}}" {{ old('presentacione_id') == $item->id ? 'selected' : '' }}>{{$item->nombre}}</option>
-                            @else
-                            <option value="{{$item->id}}" {{ old('presentacione_id') == $item->id ? 'selected' : '' }}>{{$item->nombre}}</option>
-                            @endif
+                            <option value="{{ $item->id }}" 
+                                {{ old('presentacione_id', $producto->presentacione_id) == $item->id ? 'selected' : '' }}>
+                                {{ $item->nombre }}
+                            </option>
                             @endforeach
                         </select>
                         @error('presentacione_id')
-                        <small class="text-danger">{{'*'.$message}}</small>
+                            <div class="error-message text-danger">{{ '*'.$message }}</div>
                         @enderror
                     </div>
 
-                    <!---Categorías---->
-                    <div class="col-md-6">
-                        <label for="categorias" class="form-label">Categorías:</label>
-                        <select data-size="4" title="Seleccione las categorías" data-live-search="true" name="categorias[]" id="categorias" class="form-control selectpicker show-tick" multiple>
+                    <!-- Categorías -->
+                    <div class="col-12">
+                        <label for="categorias" class="form-label">Categorías</label>
+                        <select name="categorias[]" id="categorias" 
+                                class="form-control selectpicker show-tick @error('categorias') is-invalid @enderror"
+                                data-live-search="true" 
+                                data-size="5"
+                                multiple
+                                title="Seleccione las categorías">
                             @foreach ($categorias as $item)
-                            @if (in_array($item->id,$producto->categorias->pluck('id')->toArray()))
-                            <option selected value="{{$item->id}}" {{ (in_array($item->id , old('categorias',[]))) ? 'selected' : '' }}>{{$item->nombre}}</option>
-                            @else
-                            <option value="{{$item->id}}" {{ (in_array($item->id , old('categorias',[]))) ? 'selected' : '' }}>{{$item->nombre}}</option>
-                            @endif
+                            <option value="{{ $item->id }}" 
+                                {{ in_array($item->id, old('categorias', $producto->categorias->pluck('id')->toArray())) ? 'selected' : '' }}>
+                                {{ $item->nombre }}
+                            </option>
                             @endforeach
                         </select>
                         @error('categorias')
-                        <small class="text-danger">{{'*'.$message}}</small>
+                            <div class="error-message text-danger">{{ '*'.$message }}</div>
                         @enderror
                     </div>
                 </div>
 
-            </div>
-            <div class="card-footer text-center">
-                <button type="submit" class="btn btn-primary">Guardar</button>
-                <button type="reset" class="btn btn-secondary">Reiniciar</button>
-            </div>
-        </form>
+                <div class="card-footer text-center py-3">
+                    <button type="submit" class="btn btn-primary-custom me-2">
+                        <i class="fas fa-save me-1"></i> Guardar Cambios
+                    </button>
+                    <button type="reset" class="btn btn-outline-secondary">
+                        <i class="fas fa-undo me-1"></i> Reiniciar
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-
-
 </div>
 @endsection
 
 @push('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize select pickers
+        $('.selectpicker').selectpicker();
+        
+        // Image preview functionality
+        $('#img_path').change(function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('.img-preview').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+</script>
 @endpush

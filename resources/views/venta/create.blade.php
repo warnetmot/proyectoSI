@@ -6,6 +6,80 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    /* Estilos personalizados con la paleta de colores del sistema */
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .btn-primary-custom:hover {
+        background: linear-gradient(135deg, #5a6fd1, #67418f);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .btn-success-custom {
+        background: linear-gradient(135deg, #48bb78, #38a169);
+        border: none;
+        color: white;
+    }
+    .btn-success-custom:hover {
+        background: linear-gradient(135deg, #3fa56b, #2d8555);
+    }
+    .btn-danger-custom {
+        background: linear-gradient(135deg, #f56565, #e53e3e);
+        border: none;
+        color: white;
+    }
+    .btn-danger-custom:hover {
+        background: linear-gradient(135deg, #e04f4f, #d12e2e);
+    }
+    .card-header-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 0.375rem 0.375rem 0 0 !important;
+    }
+    .card-header-success {
+        background: linear-gradient(135deg, #48bb78, #38a169);
+        color: white;
+        border-radius: 0.375rem 0.375rem 0 0 !important;
+    }
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0.75rem 1rem;
+    }
+    .breadcrumb-item a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    h1 {
+        color: #4a5568;
+    }
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    }
+    .selectpicker:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    }
+    .table thead {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    .modal-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    .stock-info {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    .invalid-feedback {
+        display: block;
+    } 
+</style>
 @endpush
 
 @section('content')
@@ -23,408 +97,421 @@
     <div class="container-lg mt-4">
         <div class="row gy-4">
 
-            <!------venta producto---->
+            <!-- Detalles de la venta -->
             <div class="col-xl-8">
-                <div class="text-white bg-primary p-1 text-center">
-                    Detalles de la venta
-                </div>
-                <div class="p-3 border border-3 border-primary">
-                    <div class="row gy-4">
+                <div class="card shadow-sm">
+                    <div class="card-header-primary p-3">
+                        <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Detalles de la Venta</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row gy-3">
 
-                        <!-----Producto---->
-                        <div class="col-12">
-                            <select name="producto_id" id="producto_id" class="form-control selectpicker" data-live-search="true" data-size="1" title="Busque un producto aquí">
-                                @foreach ($productos as $item)
-                                <option value="{{$item->id}}-{{$item->stock}}-{{$item->precio_venta}}">{{$item->codigo.' '.$item->nombre}}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                            <!-- Producto -->
+                            <div class="col-12">
+                                <select name="producto_id" id="producto_id" class="form-control selectpicker" data-live-search="true" data-size="1" title="Busque un producto aquí">
+                                    @foreach ($productos as $item)
+                                    <option value="{{$item->id}}-{{$item->stock}}-{{$item->precio_venta}}">{{$item->codigo.' '.$item->nombre}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        <!-----Stock--->
-                        <div class="d-flex justify-content-end">
-                            <div class="col-12 col-sm-6">
+                            <!-- Información del producto -->
+                            <div class="col-12">
                                 <div class="row">
-                                    <label for="stock" class="col-form-label col-4">Stock:</label>
-                                    <div class="col-8">
-                                        <input disabled id="stock" type="text" class="form-control">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Stock disponible:</label>
+                                        <div class="input-group">
+                                            <input disabled id="stock" type="text" class="form-control"> <!-- Cambiado a id="stock" -->
+                                            <span class="input-group-text"><i class="fas fa-boxes"></i></span>
+                                        </div>
+                                        <small class="text-muted stock-info" id="stock-message"></small> <!-- Añadido mensaje de stock -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Precio unitario:</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input disabled type="number" name="precio_venta" id="precio_venta" class="form-control" step="0.1">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="cantidad" class="form-label">Cantidad:</label>
+                                        <input type="number" name="cantidad" id="cantidad" class="form-control" min="1">
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-----Precio de venta---->
-                        <div class="col-sm-4">
-                            <label for="precio_venta" class="form-label">Precio de venta:</label>
-                            <input disabled type="number" name="precio_venta" id="precio_venta" class="form-control" step="0.1">
-                        </div>
+                            <!-- Descuento -->
+                            <div class="col-12">
+                                <label for="descuento" class="form-label">Descuento ($):</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" name="descuento" id="descuento" class="form-control" min="0" value="0">
+                                </div>
+                                <small class="text-muted">Ingrese 0 si no aplica descuento</small>
+                            </div>
 
-                        <!-----Cantidad---->
-                        <div class="col-sm-4">
-                            <label for="cantidad" class="form-label">Cantidad:</label>
-                            <input type="number" name="cantidad" id="cantidad" class="form-control">
-                        </div>
+                            <!-- Botón agregar -->
+                            <div class="col-12 text-end">
+                                <button id="btn_agregar" class="btn btn-primary-custom" type="button">
+                                    <i class="fas fa-plus-circle me-1"></i> Agregar Producto
+                                </button>
+                            </div>
 
-                        <!----Descuento---->
-                        <div class="col-sm-4">
-                            <label for="descuento" class="form-label">Descuento:</label>
-                            <input type="number" name="descuento" id="descuento" class="form-control">
-                        </div>
-
-                        <!-----botón para agregar--->
-                        <div class="col-12 text-end">
-                            <button id="btn_agregar" class="btn btn-primary" type="button">Agregar</button>
-                        </div>
-
-                        <!-----Tabla para el detalle de la venta--->
-                        <div class="col-12">
-                            <div class="table-responsive">
+                            <!-- Tabla de detalles -->
+                            <div class="col-12">
+                                <div class="table-responsive">
                                 <table id="tabla_detalle" class="table table-hover">
-                                    <thead class="bg-primary">
+                                    <thead>
                                         <tr>
-                                            <th class="text-white">#</th>
-                                            <th class="text-white">Producto</th>
-                                            <th class="text-white">Cantidad</th>
-                                            <th class="text-white">Precio venta</th>
-                                            <th class="text-white">Descuento</th>
-                                            <th class="text-white">Subtotal</th>
-                                            <th></th>
+                                            <th>#</th>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio</th>
+                                            <th>Descuento</th>
+                                            <th>Subtotal</th>
+                                            <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <th></th>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
+                                        <!-- Filas se agregarán dinámicamente -->
                                     </tbody>
                                     <tfoot>
-                                        <tr>
-                                            <th></th>
-                                            <th colspan="4">Sumas</th>
-                                            <th colspan="2"><span id="sumas">0</span></th>
-                                        </tr>
-                                        <tr>
-                                            <th></th>
-                                            <th colspan="4">Impuesto %</th>
-                                            <th colspan="2"><span id="iva">0</span></th>
-                                        </tr>
-                                        <tr>
-                                            <th></th>
-                                            <th colspan="4">Total</th>
-                                            <th colspan="2"> <input type="hidden" name="total" value="0" id="inputTotal"> <span id="total">0</span></th>
-                                        </tr>
+                                        <!-- Tus filas de totales aquí -->
                                     </tfoot>
                                 </table>
+                                </div>
+                            </div>
+                            
+
+                            <!-- Botón cancelar -->
+                            <div class="col-12 text-end">
+                                <button id="cancelar" type="button" class="btn btn-danger-custom" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                                    <i class="fas fa-times-circle me-1"></i> Cancelar Venta
+                                </button>
                             </div>
                         </div>
-
-                        <!--Boton para cancelar venta--->
-                        <div class="col-12">
-                            <button id="cancelar" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                Cancelar venta
-                            </button>
-                        </div>
-
                     </div>
                 </div>
             </div>
 
-            <!-----Venta---->
+            <!-- Datos generales -->
             <div class="col-xl-4">
-                <div class="text-white bg-success p-1 text-center">
-                    Datos generales
-                </div>
-                <div class="p-3 border border-3 border-success">
-                    <div class="row gy-4">
-                        <!--Cliente-->
-                        <div class="col-12">
-                            <label for="cliente_id" class="form-label">Cliente:</label>
-                            <select name="cliente_id" id="cliente_id" class="form-control selectpicker show-tick" data-live-search="true" title="Selecciona" data-size='2'>
-                                @foreach ($clientes as $item)
-                                <option value="{{$item->id}}">{{$item->persona->razon_social}}</option>
-                                @endforeach
-                            </select>
-                            @error('cliente_id')
-                            <small class="text-danger">{{ '*'.$message }}</small>
-                            @enderror
+                <div class="card shadow-sm">
+                    <div class="card-header-success p-3">
+                        <h5 class="mb-0"><i class="fas fa-file-invoice me-2"></i>Datos Generales</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row gy-3">
+                            <!-- Cliente -->
+                            <div class="col-12">
+                                <label for="cliente_id" class="form-label">Cliente:</label>
+                                <select name="cliente_id" id="cliente_id" class="form-control selectpicker show-tick" data-live-search="true" title="Seleccione un cliente" data-size='2'>
+                                    @foreach ($clientes as $item)
+                                    <option value="{{$item->id}}">{{$item->persona->razon_social}}</option>
+                                    @endforeach
+                                </select>
+                                @error('cliente_id')
+                                <div class="invalid-feedback">
+                                    <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+
+                            <!-- Comprobante -->
+                            <div class="col-12">
+                                <label for="comprobante_id" class="form-label">Tipo de Comprobante:</label>
+                                <select name="comprobante_id" id="comprobante_id" class="form-control selectpicker" title="Seleccione un tipo">
+                                    @foreach ($comprobantes as $item)
+                                    <option value="{{$item->id}}">{{$item->tipo_comprobante}}</option>
+                                    @endforeach
+                                </select>
+                                @error('comprobante_id')
+                                <div class="invalid-feedback">
+                                    <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+
+                            <!-- Número de comprobante -->
+                            <div class="col-12">
+                                <label for="numero_comprobante" class="form-label">Número de Comprobante:</label>
+                                <input required type="text" name="numero_comprobante" id="numero_comprobante" class="form-control" placeholder="Ingrese el número">
+                                @error('numero_comprobante')
+                                <div class="invalid-feedback">
+                                    <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+
+                            <!-- Impuesto -->
+                            <div class="col-md-6">
+                                <label for="impuesto" class="form-label">Impuesto (%):</label>
+                                <input type="number" name="impuesto" id="impuesto" class="form-control" min="0" max="100" step="0.1" value="16">
+                                @error('impuesto')
+                                <div class="invalid-feedback">
+                                    <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="total" class="form-label">Total:</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" id="total" class="form-control" readonly>
+                                </div>
+                                <!-- Campo oculto que se enviará con el formulario -->
+                                <input type="hidden" name="total" id="inputTotal">
+                            </div>
+
+                            <!-- Fecha -->
+                            <div class="col-md-6">
+                                <label for="fecha" class="form-label">Fecha:</label>
+                                <input readonly type="date" name="fecha" id="fecha" class="form-control" value="<?php echo date("Y-m-d") ?>">
+                                <?php
+                                use Carbon\Carbon;
+                                $fecha_hora = Carbon::now()->toDateTimeString();
+                                ?>
+                                <input type="hidden" name="fecha_hora" value="{{$fecha_hora}}">
+                            </div>
+
+                            <!-- Usuario -->
+                            <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
+
+                            <!-- Botón guardar -->
+                            <div class="col-12 text-center mt-3">
+                                <button type="submit" class="btn btn-success-custom px-4" id="guardar">
+                                    <i class="fas fa-check-circle me-2"></i> Registrar Venta
+                                </button>
+                            </div>
                         </div>
-
-                        <!--Tipo de comprobante-->
-                        <div class="col-12">
-                            <label for="comprobante_id" class="form-label">Comprobante:</label>
-                            <select name="comprobante_id" id="comprobante_id" class="form-control selectpicker" title="Selecciona">
-                                @foreach ($comprobantes as $item)
-                                <option value="{{$item->id}}">{{$item->tipo_comprobante}}</option>
-                                @endforeach
-                            </select>
-                            @error('comprobante_id')
-                            <small class="text-danger">{{ '*'.$message }}</small>
-                            @enderror
-                        </div>
-
-                        <!--Numero de comprobante-->
-                        <div class="col-12">
-                            <label for="numero_comprobante" class="form-label">Numero de comprobante:</label>
-                            <input required type="text" name="numero_comprobante" id="numero_comprobante" class="form-control">
-                            @error('numero_comprobante')
-                            <small class="text-danger">{{ '*'.$message }}</small>
-                            @enderror
-                        </div>
-
-                        <!--Impuesto---->
-                        <div class="col-sm-6">
-                            <label for="impuesto" class="form-label">Impuesto(%):</label>
-                            <input type="number" name="impuesto" id="impuesto" class="form-control border-success" min="0" step="0.1" value="16">
-                            @error('impuesto')
-                            <small class="text-danger">{{ '*'.$message }}</small>
-                            @enderror
-                        </div>
-
-                        <!--Fecha--->
-                        <div class="col-sm-6">
-                            <label for="fecha" class="form-label">Fecha:</label>
-                            <input readonly type="date" name="fecha" id="fecha" class="form-control border-success" value="<?php echo date("Y-m-d") ?>">
-                            <?php
-
-                            use Carbon\Carbon;
-
-                            $fecha_hora = Carbon::now()->toDateTimeString();
-                            ?>
-                            <input type="hidden" name="fecha_hora" value="{{$fecha_hora}}">
-                        </div>
-
-                        <!----User--->
-                        <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
-
-                        <!--Botones--->
-                        <div class="col-12 text-center">
-                            <button type="submit" class="btn btn-success" id="guardar">Realizar venta</button>
-                        </div>
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal para cancelar la venta -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- Modal para cancelar venta -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Advertencia</h1>
+                    <h5 class="modal-title" id="cancelModalLabel"><i class="fas fa-exclamation-triangle me-2"></i>Confirmar Cancelación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Seguro que quieres cancelar la venta?
+                    <p>¿Está seguro que desea cancelar esta venta?</p>
+                    <p class="text-muted small">Se eliminarán todos los productos agregados al detalle.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button id="btnCancelarVenta" type="button" class="btn btn-danger" data-bs-dismiss="modal">Confirmar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> No, continuar
+                    </button>
+                    <button id="btnCancelarVenta" type="button" class="btn btn-danger-custom" data-bs-dismiss="modal">
+                        <i class="fas fa-check me-1"></i> Sí, cancelar
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-
 </form>
 @endsection
 
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#producto_id').change(mostrarValores);
-        $('#btn_agregar').click(function() {
-            agregarProducto();
-        });
-        $('#btnCancelarVenta').click(function() {
-            cancelarVenta();
-        });
-        // Add listener for IVA changes
-        $('#impuesto').change(function() {
-            recalcularTotales();
-        });
-        
-        disableButtons();
-    });
-
-    //Variables
+$(document).ready(function() {
+    // Inicialización del selectpicker
+    $('.selectpicker').selectpicker();
+    
+    // Variables globales
     let cont = 0;
     let subtotal = [];
     let sumas = 0;
     let iva = 0;
     let total = 0;
+    let productsInCart = {};
+    let productStocks = {};
 
-    // Function to recalculate totals when IVA changes
-    function recalcularTotales() {
-        let impuestoActual = parseFloat($('#impuesto').val()) || 0;
-        iva = round(sumas / 100 * impuestoActual);
-        total = round(sumas + iva);
-        
-        $('#iva').html(iva);
-        $('#total').html(total);
-        $('#inputTotal').val(total);
-    }
+    // Eventos
+    $('#producto_id').on('changed.bs.select', mostrarValores);
+    $('#btn_agregar').click(agregarProducto);
+    $('#btnCancelarVenta').click(cancelarVenta);
+    $('#impuesto').change(recalcularTotales);
+    
+    disableButtons();
 
+    // Mostrar valores del producto seleccionado
     function mostrarValores() {
-        let dataProducto = document.getElementById('producto_id').value.split('-');
-        $('#stock').val(dataProducto[1]);
-        $('#precio_venta').val(dataProducto[2]);
-    }
-
-    function agregarProducto() {
-        let dataProducto = document.getElementById('producto_id').value.split('-');
-        let idProducto = dataProducto[0];
-        let nameProducto = $('#producto_id option:selected').text();
-        let cantidad = $('#cantidad').val();
-        let precioVenta = $('#precio_venta').val();
-        let descuento = $('#descuento').val();
-        let stock = $('#stock').val();
-        let impuestoActual = parseFloat($('#impuesto').val()) || 0;
-
-        if (descuento == '') {
-            descuento = 0;
-        }
-
-        if (idProducto != '' && cantidad != '') {
-            if (parseInt(cantidad) > 0 && (cantidad % 1 == 0) && parseFloat(descuento) >= 0) {
-                if (parseInt(cantidad) <= parseInt(stock)) {
-                    subtotal[cont] = round(cantidad * precioVenta - descuento);
-                    sumas += subtotal[cont];
-                    iva = round(sumas / 100 * impuestoActual);
-                    total = round(sumas + iva);
-
-                    let fila = '<tr id="fila' + cont + '">' +
-                        '<th>' + (cont + 1) + '</th>' +
-                        '<td><input type="hidden" name="arrayidproducto[]" value="' + idProducto + '">' + nameProducto + '</td>' +
-                        '<td><input type="hidden" name="arraycantidad[]" value="' + cantidad + '">' + cantidad + '</td>' +
-                        '<td><input type="hidden" name="arrayprecioventa[]" value="' + precioVenta + '">' + precioVenta + '</td>' +
-                        '<td><input type="hidden" name="arraydescuento[]" value="' + descuento + '">' + descuento + '</td>' +
-                        '<td>' + subtotal[cont] + '</td>' +
-                        '<td><button class="btn btn-danger" type="button" onClick="eliminarProducto(' + cont + ')"><i class="fa-solid fa-trash"></i></button></td>' +
-                        '</tr>';
-
-                    $('#tabla_detalle').append(fila);
-                    limpiarCampos();
-                    cont++;
-                    disableButtons();
-
-                    $('#sumas').html(sumas);
-                    $('#iva').html(iva);
-                    $('#total').html(total);
-                    $('#inputTotal').val(total);
-                } else {
-                    showModal('Cantidad incorrecta');
-                }
-            } else {
-                showModal('Valores incorrectos');
+        let productoSeleccionado = $('#producto_id').val();
+        
+        if (productoSeleccionado) {
+            let datos = productoSeleccionado.split('-');
+            if (datos.length >= 3) {
+                let id = datos[0];
+                let stock = parseInt(datos[1]);
+                let precio = parseFloat(datos[2]);
+                
+                productStocks[id] = stock;
+                let stockDisponible = productsInCart[id] ? stock - productsInCart[id].cantidad : stock;
+                
+                $('#stock').val(stockDisponible);
+                $('#precio_venta').val(precio.toFixed(2));
+                $('#cantidad').val('1').attr('max', stockDisponible).focus();
+                updateStockMessage(stockDisponible);
             }
         } else {
-            showModal('Le faltan campos por llenar');
+            limpiarCamposStock();
         }
     }
 
-    function eliminarProducto(indice) {
-        sumas -= round(subtotal[indice]);
-        let impuestoActual = parseFloat($('#impuesto').val()) || 0;
-        iva = round(sumas / 100 * impuestoActual);
+    function updateStockMessage(stock) {
+        let message = $('#stock-message');
+        message.text(stock > 10 ? 'Stock suficiente' : (stock > 0 ? 'Stock bajo' : 'Sin stock'))
+               .removeClass('text-danger text-warning text-success')
+               .addClass(stock > 10 ? 'text-success' : (stock > 0 ? 'text-warning' : 'text-danger'));
+    }
+
+    function limpiarCamposStock() {
+        $('#stock, #precio_venta, #cantidad, #stock-message').val('').removeAttr('max');
+        $('#stock-message').removeClass('text-success text-warning text-danger');
+    }
+
+    function round(num, decimales = 2) {
+        return parseFloat(num.toFixed(decimales));
+    }
+
+    function showModal(message, icon = 'error') {
+        Swal.fire({
+            icon: icon,
+            title: icon === 'error' ? 'Error' : (icon === 'warning' ? 'Advertencia' : 'Éxito'),
+            text: message,
+            confirmButtonColor: '#667eea'
+        });
+    }
+
+    function disableButtons() {
+        $('#guardar, #cancelar').toggle(total > 0);
+    }
+
+    function updateTotals(impuestoActual) {
+        sumas = subtotal.reduce((a, b) => a + (b || 0), 0);
+        iva = round(sumas * (impuestoActual / 100));
         total = round(sumas + iva);
 
-        $('#sumas').html(sumas);
-        $('#iva').html(iva);
-        $('#total').html(total);
-        $('#inputTotal').val(total);
-
-        $('#fila' + indice).remove();
+        $('#sumas').text(sumas.toFixed(2));
+        $('#iva').text(iva.toFixed(2));
+        $('#total').val(total.toFixed(2));
+        $('#inputTotal').val(total.toFixed(2));
+        
         disableButtons();
     }
 
+    function recalcularTotales() {
+        updateTotals(parseFloat($('#impuesto').val()) || 0);
+    }
+
+    function limpiarCampos() {
+        $('#producto_id').selectpicker('val', '');
+        $('#descuento').val('0');
+        limpiarCamposStock();
+        $('#producto_id').focus();
+    }
+
+    function agregarProducto() {
+        let productoSeleccionado = $('#producto_id').val();
+        if (!productoSeleccionado) return showModal('Debe seleccionar un producto', 'error');
+        
+        let datos = productoSeleccionado.split('-');
+        if (datos.length < 3) return showModal('Datos del producto incompletos', 'error');
+        
+        let [idProducto, stockTotal, precioVenta] = [datos[0], parseInt(datos[1]), parseFloat(datos[2])];
+        let cantidad = parseInt($('#cantidad').val()) || 0;
+        let descuento = parseFloat($('#descuento').val()) || 0;
+        let impuestoActual = parseFloat($('#impuesto').val()) || 0;
+        
+        if (isNaN(cantidad) || cantidad <= 0) return showModal('La cantidad debe ser mayor a cero', 'error');
+        
+        let stockDisponible = productStocks[idProducto] - (productsInCart[idProducto]?.cantidad || 0);
+        if (cantidad > stockDisponible) return showModal(`No hay suficiente stock. Disponible: ${stockDisponible} unidades`, 'warning');
+        
+        let subtotalItem = round(cantidad * precioVenta - descuento);
+        subtotal[cont] = subtotalItem;
+        
+        let fila = `
+        <tr id="fila${cont}" data-product-id="${idProducto}">
+            <th>${cont + 1}</th>
+            <td><input type="hidden" name="detalles[${cont}][producto_id]" value="${idProducto}">${$('#producto_id option:selected').text()}</td>
+            <td><input type="hidden" name="detalles[${cont}][cantidad]" value="${cantidad}">${cantidad}</td>
+            <td><input type="hidden" name="detalles[${cont}][precio_venta]" value="${precioVenta.toFixed(2)}">$${precioVenta.toFixed(2)}</td>
+            <td><input type="hidden" name="detalles[${cont}][descuento]" value="${descuento.toFixed(2)}">$${descuento.toFixed(2)}</td>
+            <td>$${subtotalItem.toFixed(2)}</td>
+            <td><button class="btn btn-sm btn-danger-custom" type="button" onClick="eliminarProducto(${cont}, '${idProducto}', ${cantidad})"><i class="fas fa-trash-alt"></i></button></td>
+        </tr>`;
+        
+        $('#tabla_detalle tbody').append(fila);
+        
+        productsInCart[idProducto] = {
+            cantidad: (productsInCart[idProducto]?.cantidad || 0) + cantidad,
+            precio: precioVenta,
+            stock: stockTotal
+        };
+        
+        updateTotals(impuestoActual);
+        cont++;
+        limpiarCampos();
+    }
+
+    window.eliminarProducto = function(indice, idProducto, cantidad) {
+        subtotal.splice(indice, 1);
+        
+        if (productsInCart[idProducto]) {
+            productsInCart[idProducto].cantidad -= cantidad;
+            if (productsInCart[idProducto].cantidad <= 0) delete productsInCart[idProducto];
+        }
+        
+        $(`#fila${indice}`).remove();
+        $('#tabla_detalle tbody tr').each((i, row) => $(row).find('th').text(i + 1));
+        
+        updateTotals(parseFloat($('#impuesto').val()) || 0);
+        if ($('#producto_id').val().split('-')[0] === idProducto) mostrarValores();
+    };
+
     function cancelarVenta() {
-        //Elimar el tbody de la tabla
         $('#tabla_detalle tbody').empty();
-
-        //Añadir una nueva fila a la tabla
-        let fila = '<tr>' +
-            '<th></th>' +
-            '<td></td>' +
-            '<td></td>' +
-            '<td></td>' +
-            '<td></td>' +
-            '<td></td>' +
-            '<td></td>' +
-            '</tr>';
-        $('#tabla_detalle').append(fila);
-
-        //Reiniciar valores de las variables
-        cont = 0;
-        subtotal = [];
-        sumas = 0;
-        iva = 0;
-        total = 0;
-
-        //Mostrar los campos calculados
-        $('#sumas').html(sumas);
-        $('#iva').html(iva);
-        $('#total').html(total);
-        $('#inputTotal').val(total);
-
+        [cont, subtotal, sumas, iva, total, productsInCart] = [0, [], 0, 0, 0, {}];
+        $('#sumas, #iva').text('0.00');
+        $('#total, #inputTotal').val('0');
         limpiarCampos();
         disableButtons();
     }
 
-    function disableButtons() {
-        if (total == 0) {
-            $('#guardar').hide();
-            $('#cancelar').hide();
-        } else {
-            $('#guardar').show();
-            $('#cancelar').show();
+    $('form').on('submit', function(e) {
+        if (Object.keys(productsInCart).length === 0) {
+            e.preventDefault();
+            return showModal('Debe agregar al menos un producto para realizar la venta', 'error');
         }
-    }
-
-    function limpiarCampos() {
-        let select = $('#producto_id');
-        select.selectpicker('val', '');
-        $('#cantidad').val('');
-        $('#precio_venta').val('');
-        $('#descuento').val('');
-        $('#stock').val('');
-    }
-
-    function showModal(message, icon = 'error') {
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        })
-
-        Toast.fire({
-            icon: icon,
-            title: message
-        })
-    }
-
-    function round(num, decimales = 2) {
-        var signo = (num >= 0 ? 1 : -1);
-        num = num * signo;
-        if (decimales === 0) //con 0 decimales
-            return signo * Math.round(num);
-        // round(x * 10 ^ decimales)
-        num = num.toString().split('e');
-        num = Math.round(+(num[0] + 'e' + (num[1] ? (+num[1] + decimales) : decimales)));
-        // x * 10 ^ (-decimales)
-        num = num.toString().split('e');
-        return signo * (num[0] + 'e' + (num[1] ? (+num[1] - decimales) : -decimales));
-    }
+        
+        if ($('#cliente_id').val() === null) {
+            e.preventDefault();
+            return showModal('Debe seleccionar un cliente', 'error');
+        }
+        
+        if ($('#comprobante_id').val() === null) {
+            e.preventDefault();
+            return showModal('Debe seleccionar un tipo de comprobante', 'error');
+        }
+        
+        if ($('#numero_comprobante').val().trim() === '') {
+            e.preventDefault();
+            return showModal('Debe ingresar un número de comprobante', 'error');
+        }
+        
+        if (total <= 0 || isNaN(total)) {
+            e.preventDefault();
+            return showModal('El total de la venta no es válido', 'error');
+        }
+    });
+});
 </script>
 @endpush

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\DetalleVenta;
 use App\Http\Requests\StoreVentaRequest;
 use App\Models\Cliente;
 use App\Models\Comprobante;
@@ -10,8 +10,9 @@ use App\Models\Venta;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
-class ventaController extends Controller
+class VentaController extends Controller
 {
     function __construct()
     {
@@ -20,38 +21,27 @@ class ventaController extends Controller
         $this->middleware('permission:mostrar-venta', ['only' => ['show']]);
         $this->middleware('permission:eliminar-venta', ['only' => ['destroy']]);
     }
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        $ventas = Venta::with(['comprobante','cliente.persona','user'])
-        ->where('estado',1)
-        ->latest()
-        ->get();
-        $ventas = Venta::with('productos.marca')->get();
-        return view('venta.index',compact('ventas'));
+        $ventas = Venta::with(['comprobante', 'cliente.persona', 'user', 'productos.marca'])
+            ->where('estado', 1)
+            ->latest()
+            ->get();
+
+        return view('venta.index', compact('ventas'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-
-        $subquery = DB::table('compra_producto')
-            ->select('producto_id', DB::raw('MAX(created_at) as max_created_at'))
-            ->groupBy('producto_id');
-
-        $productos = Producto::join('compra_producto as cpr', function ($join) use ($subquery) {
-            $join->on('cpr.producto_id', '=', 'productos.id')
-                ->whereIn('cpr.created_at', function ($query) use ($subquery) {
-                    $query->select('max_created_at')
-                        ->fromSub($subquery, 'subquery')
-                        ->whereRaw('subquery.producto_id = cpr.producto_id');
-                });
-        })
-            ->select('productos.nombre', 'productos.id', 'productos.stock', 'cpr.precio_venta')
+        $productos = Producto::select([
+                'productos.id',
+                'productos.codigo',
+                'productos.nombre',
+                'productos.stock',
+                DB::raw('(SELECT precio_venta FROM compra_producto WHERE producto_id = productos.id ORDER BY created_at DESC LIMIT 1) as precio_venta')
+            ])
+            ->with('marca')
             ->where('productos.estado', 1)
             ->where('productos.stock', '>', 0)
             ->get();
@@ -59,98 +49,143 @@ class ventaController extends Controller
         $clientes = Cliente::whereHas('persona', function ($query) {
             $query->where('estado', 1);
         })->get();
+
         $comprobantes = Comprobante::all();
 
         return view('venta.create', compact('productos', 'clientes', 'comprobantes'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreVentaRequest $request)
-    {
-        try{
-            DB::beginTransaction();
-
-            //Llenar mi tabla venta
-            $venta = Venta::create($request->validated());
-
-            //Llenar mi tabla venta_producto
-            //1. Recuperar los arrays
-            $arrayProducto_id = $request->get('arrayidproducto');
-            $arrayCantidad = $request->get('arraycantidad');
-            $arrayPrecioVenta = $request->get('arrayprecioventa');
-            $arrayDescuento = $request->get('arraydescuento');
-
-            //2.Realizar el llenado
-            $siseArray = count($arrayProducto_id);
-            $cont = 0;
-
-            while($cont < $siseArray){
-                $venta->productos()->syncWithoutDetaching([
-                    $arrayProducto_id[$cont] => [
-                        'cantidad' => $arrayCantidad[$cont],
-                        'precio_venta' => $arrayPrecioVenta[$cont],
-                        'descuento' => $arrayDescuento[$cont]
-                    ]
-                ]);
-
-                //Actualizar stock
-                $producto = Producto::find($arrayProducto_id[$cont]);
-                $stockActual = $producto->stock;
-                $cantidad = intval($arrayCantidad[$cont]);
-
-                DB::table('productos')
-                ->where('id',$producto->id)
-                ->update([
-                    'stock' => $stockActual - $cantidad
-                ]);
-
-                $cont++;
-            }
-
-            DB::commit();
-        }catch(Exception $e){
-            DB::rollBack();
-        }
-
-        return redirect()->route('ventas.index')->with('success','Venta exitosa');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Venta $venta)
-    {
-        return view('venta.show',compact('venta'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        Venta::where('id',$id)
-        ->update([
-            'estado' => 0
+    public function store(Request $request)
+{
+    DB::beginTransaction();
+    
+    try {
+        // Validación de datos
+        $request->validate([
+            'cliente_id' => 'required|exists:clientes,id',
+            'comprobante_id' => 'required|exists:comprobantes,id',
+            'numero_comprobante' => 'required|string|max:255',
+            'impuesto' => 'required|numeric|min:0',
+            'total' => 'required|numeric|min:0',
+            'detalles' => 'required|array|min:1',
+            'detalles.*.producto_id' => 'required|exists:productos,id',
+            'detalles.*.cantidad' => 'required|integer|min:1',
+            'detalles.*.precio_venta' => 'required|numeric|min:0',
+            'detalles.*.descuento' => 'required|numeric|min:0',
         ]);
 
-        return redirect()->route('ventas.index')->with('success','Venta eliminada');
+        // Crear la venta
+        $venta = Venta::create([
+            'cliente_id' => $request->cliente_id,
+            'user_id' => auth()->id(), // Mejor usar auth()->id() directamente
+            'comprobante_id' => $request->comprobante_id,
+            'numero_comprobante' => $request->numero_comprobante,
+            'impuesto' => $request->impuesto,
+            'total' => $request->total,
+            'fecha_hora' => now(), // Mejor usar now() directamente
+        ]);
+        
+        // Procesar cada detalle
+        foreach ($request->detalles as $detalle) {
+            // Verificar stock
+            $producto = Producto::findOrFail($detalle['producto_id']);
+            if ($producto->stock < $detalle['cantidad']) {
+                throw new \Exception("No hay suficiente stock para el producto: {$producto->nombre}");
+            }
+
+            // Crear detalle
+            $venta->productos()->attach($detalle['producto_id'], [
+                'cantidad' => $detalle['cantidad'],
+                'precio_venta' => $detalle['precio_venta'],
+                'descuento' => $detalle['descuento']
+            ]);
+            
+            // Actualizar stock
+            $producto->decrement('stock', $detalle['cantidad']);
+        }
+        
+        DB::commit();
+        
+        return redirect()->route('ventas.index')
+            ->with('success', 'Venta registrada correctamente');
+        
+    } catch (\Exception $e) {
+        DB::rollback();
+        Log::error('Error al registrar venta: ' . $e->getMessage());
+        return back()
+            ->withInput()
+            ->with('error', 'Error al registrar la venta: ' . $e->getMessage());
+    }
+}
+
+    public function show(Venta $venta)
+    {
+        $venta->load(['productos.marca', 'comprobante', 'cliente.persona', 'user']);
+        return view('venta.show', compact('venta'));
+    }
+
+    public function destroy($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $venta = Venta::with('productos')->findOrFail($id);
+            
+            // Revertir stock
+            foreach ($venta->productos as $producto) {
+                $producto->increment('stock', $producto->pivot->cantidad);
+            }
+
+            // Anular venta
+            $venta->update(['estado' => 0]);
+
+            DB::commit();
+
+            return redirect()->route('ventas.index')
+                ->with('success', 'Venta anulada exitosamente');
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error al anular venta: ' . $e->getMessage());
+            
+            return back()->with('error', 'Ocurrió un error al anular la venta');
+        }
+    }
+
+    protected function validarStock(Request $request): bool
+    {
+        $arrayProducto_id = $request->get('arrayidproducto');
+        $arrayCantidad = $request->get('arraycantidad');
+
+        foreach ($arrayProducto_id as $index => $productoId) {
+            $producto = Producto::find($productoId);
+            $cantidad = intval($arrayCantidad[$index]);
+
+            if ($producto->stock < $cantidad) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function procesarProductos(Venta $venta, Request $request): void
+    {
+        $arrayProducto_id = $request->get('arrayidproducto');
+        $arrayCantidad = $request->get('arraycantidad');
+        $arrayPrecioVenta = $request->get('arrayprecioventa');
+        $arrayDescuento = $request->get('arraydescuento');
+
+        foreach ($arrayProducto_id as $index => $productoId) {
+            $venta->productos()->attach($productoId, [
+                'cantidad' => $arrayCantidad[$index],
+                'precio_venta' => $arrayPrecioVenta[$index],
+                'descuento' => $arrayDescuento[$index]
+            ]);
+
+            // Actualizar stock
+            Producto::where('id', $productoId)
+                ->decrement('stock', $arrayCantidad[$index]);
+        }
     }
 }
