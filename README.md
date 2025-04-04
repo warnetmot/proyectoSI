@@ -58,13 +58,5 @@ php artisan db:seed
 php artisan serve
 ```
 
-## Notas
-- Obtenga más información sobre este proyecto [aquí](https://universityproyectx.blogspot.com/2022/10/sistema-de-ventas-web-minersa-srl.html).
-- [FAQ sobre el proyecto](https://universityproyectx.blogspot.com/2023/06/faq-sobre-el-sistema-de-ventas-de.html)
-
-## Licencia
-- Este proyecto está licenciado bajo la Licencia MIT. Para más información, consulta el archivo [LICENSE](LICENSE).
-- Obtenga más información sobre esta licencia  [MIT license](https://opensource.org/licenses/MIT).
-
 ------------
 ![Img](https://github.com/SakNoelCode/Imagenes_Proyectos/blob/master/sistemaAbarrotecategory.png)
